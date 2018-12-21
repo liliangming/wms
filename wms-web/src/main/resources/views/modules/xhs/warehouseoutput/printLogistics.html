@@ -1,0 +1,135 @@
+<% layout('/layouts/default.html', {title: '快递单打印', libs: ['validate','fileupload','dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('快递单打印')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${xhsWarehouseOutputLogisticsBO}" action="${ctx}/xhs/warehouseoutput/xhsWarehouseOutput/saveLogistics" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('请确认收寄件人信息')}</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required">*</span> ${text('收货人姓名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-6">
+								<#form:hidden path="receiverId"/>
+								<#form:input path="receiverName" maxlength="11" class="form-control required" placeholder="${text('请输入收货人姓名')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required">*</span> ${text('收货人电话')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-6">
+								<#form:input path="receiverPhone" maxlength="11" class="form-control required phone" placeholder="${text('请输入收货人电话')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required">*</span> ${text('收货人地址')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-6">
+								<#form:textarea path="receiverAddr" rows="4"  maxlength="200" class="form-control required" placeholder="${text('请输入收货人地址')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required">*</span> ${text('发货人姓名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-6">
+								<#form:hidden path="senderId"/>
+								<#form:input path="senderName" maxlength="11" class="form-control required" placeholder="${text('请输入发货人姓名')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required">*</span> ${text('发货人电话')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-6">
+								<#form:input path="senderPhone" maxlength="11" class="form-control required phone" placeholder="${text('请输入发货人电话')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required">*</span> ${text('发货人地址')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-6">
+								<#form:textarea path="senderAddr" rows="4"  maxlength="200" class="form-control required" placeholder="${text('请输入发货人地址')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<h4 class="form-unit">${text('选择快递类型')}</h4>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required">*</span> ${text('快递类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-6">
+								<#form:hidden path="logisticsId"/>
+								<#form:select path="mailType" dictType="sys_mail_type" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-6">
+								<#form:textarea path="logisticsRemark" rows="4" maxlength="200" class="form-control" placeholder="${text('无')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('xhs:warehouseoutput:xhsWarehouseOutput:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+</script>

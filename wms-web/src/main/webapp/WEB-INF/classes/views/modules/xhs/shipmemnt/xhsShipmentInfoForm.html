@@ -1,0 +1,254 @@
+<% layout('/layouts/default.html', {title: '出货信息管理', libs: ['validate','dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text(xhsShipmentInfo.isNewRecord ? '新增出货信息' : '编辑出货信息')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${xhsShipmentInfo}" action="${ctx}/xhs/shipmemnt/xhsShipmentInfo/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="id"/>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('产品选择')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:listselect id="productSelect" title="产品"
+                                    path="product.id" url="${ctx}/xhs/product/xhsProductInfo/productSelect" allowClear="false" 
+                                    checkbox="false" itemCode="id" itemName="productName"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('选择仓库')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="warehousePositionSec" title="${text('选择仓库')}"
+									path="warehousePosition.id" labelPath=""
+									url="${ctx}/xhs/warehouse/xhsWarehouseInfo/treeData?ctrlPermi=2"
+									class="" allowClear="true"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('出货数量')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="quantity" maxlength="11" class="form-control required digits"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('选择客户')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:listselect id="customerSelect" title="客户"
+                                    path="customer.id" url="${ctx}/xhs/customer/xhsCustomerInfo/customerSelect" allowClear="false" 
+                                    checkbox="false" itemCode="id" itemName="name"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('描述')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-10">
+								<#form:textarea path="remarks" rows="4" maxlength="200" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<h4 class="form-unit">${text('收货地址')}</h4>
+				<div class="ml10 mr10" style="height:35px">
+				  <button type="button" class="btn btn-sm btn-default" id="btnSecReceiveAddr" onclick=""> ${text('选择收货地址')}</button>
+				</div>
+				<div class="ml10 mr10">
+					<table id="xhsShipmentReceiverDataGrid"></table>
+				</div>
+				<h4 class="form-unit">${text('发货地址')}</h4>
+				<div class="ml10 mr10" style="height:35px">
+				  <button type="button" class="btn btn-sm btn-default" id="btnSecSendAddr" onclick=""> ${text('选择发货地址')}</button>
+				</div>
+				<div class="ml10 mr10">
+					<table id="xhsShipmentSenderDataGrid"></table>
+				</div>
+				<!--
+				<h4 class="form-unit">${text('物流信息')}</h4>
+				<div class="ml10 mr10">
+					<table id="xhsShipmentLogisticsDataGrid"></table>
+					<% if (hasPermi('xhs:shipmemnt:xhsShipmentInfo:edit')){ %>
+						<a href="#" id="xhsShipmentLogisticsDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10"><i class="fa fa-plus"></i> ${text('增行')}</a>
+					<% } %>
+				</div>
+				-->
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('xhs:shipmemnt:xhsShipmentInfo:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+//初始化收货地址DataGrid对象
+$("#xhsShipmentReceiverDataGrid").dataGrid({
+
+	data: ${toJson(xhsShipmentInfo.xhsShipmentReceiverList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'id', editable:true, hidden:true},
+		{header:'${text('出货单号')}', name:'shipmentId.id', editable:true, hidden:true},
+		{header:'${text('收件人姓名')}', name:'receiverName', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control'}},
+		{header:'${text('收件人地址')}', name:'receiverAddr', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control'}},
+		{header:'${text('收件人电话')}', name:'receiverPhone', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'20', 'class':'form-control'}},
+		{header:'${text('备注')}', name:'remarks', width:150, editable:true, edittype:'textarea', editoptions:{'maxlength':'200', 'class':'form-control', 'rows':'1'}},
+		{header:'${text('操作')}', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsShipmentReceiverDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsShipmentReceiverDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'})});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	editGridInitRowNum: 1,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#xhsShipmentReceiverDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'xhsShipmentReceiverList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,id,shipmentId.id,receiverName,receiverAddr,receiverPhone,remarks,createBy,createDate,updateBy,updateDate,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化发货地址DataGrid对象
+$("#xhsShipmentSenderDataGrid").dataGrid({
+
+	data: ${toJson(xhsShipmentInfo.xhsShipmentSenderList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'id', editable:true, hidden:true},
+		{header:'${text('出货单号')}', name:'shipmentId.id', editable:true, hidden:true},
+		{header:'${text('寄件人姓名')}', name:'senderName', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control'}},
+		{header:'${text('寄件人地址')}', name:'senderAddr', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control'}},
+		{header:'${text('寄件人电话')}', name:'senderPhone', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'20', 'class':'form-control'}},
+		{header:'${text('操作')}', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsShipmentSenderDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsShipmentSenderDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'})});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	editGridInitRowNum: 1,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#xhsShipmentSenderDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'xhsShipmentSenderList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,id,shipmentId.id,senderName,senderAddr,senderPhone,remarks,createBy,createDate,updateBy,updateDate,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化物流信息DataGrid对象
+$("#xhsShipmentLogisticsDataGrid").dataGrid({
+
+	data: ${toJson(xhsShipmentInfo.xhsShipmentLogisticsList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'id', editable:true, hidden:true},
+		{header:'${text('出货单号')}', name:'shipmentId.id', editable:true, hidden:true},
+		{header:'${text('快递类型')}', name:'mailType', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'20', 'class':'form-control'}},
+		{header:'${text('快递单号')}', name:'mailNumber', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'50', 'class':'form-control'}},
+		{header:'${text('操作')}', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsShipmentLogisticsDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsShipmentLogisticsDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'})});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	editGridInitRowNum: 1,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#xhsShipmentLogisticsDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'xhsShipmentLogisticsList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,id,shipmentId.id,mailType,mailNumber,remarks,createBy,createDate,updateBy,updateDate,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+</script>

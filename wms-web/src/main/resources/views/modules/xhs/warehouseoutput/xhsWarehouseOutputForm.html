@@ -1,0 +1,296 @@
+<% layout('/layouts/default.html', {title: '出库信息管理', libs: ['validate','fileupload','dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text(xhsWarehouseOutput.isNewRecord ? '新增出库信息' : '编辑出库信息')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${xhsWarehouseOutput}" action="${ctx}/xhs/warehouseoutput/xhsWarehouseOutput/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="id"/>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('产品')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:listselect id="productSelect" title="产品"
+                                    path="product.id" url="${ctx}/xhs/product/xhsProductInfo/productSelect" allowClear="false" 
+                                    checkbox="false" itemCode="id" itemName="productName" labelPath="product.productName"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('单价')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input id="price" path="outputPrice" style="width: 40%; display: inline;" class="form-control number"/>元/ <#form:input id="per" path="outputPer" maxlength="11" style="width: 30%; display: inline;" class="form-control digits"/>个
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('出库仓库')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="warehouse" title="${text('仓库')}"
+									path="warehouse.treeCode" labelPath="warehouse.treeName"
+									url="${ctx}/xhs/warehouse/xhsWarehouseTree/treeData"
+									class="" allowClear="true" canSelectRoot="true" canSelectParent="true"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('出库数量')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="outputQuantity" maxlength="11" class="form-control required digits"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('出货客户')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:listselect id="customerSelect" title="客户" labelPath="customer.name"
+                                    path="customer.id" url="${ctx}/xhs/customer/xhsCustomerInfo/customerSelect" allowClear="false" 
+                                    checkbox="false" itemCode="id" itemName="name"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('描述')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-10">
+								<#form:textarea path="remarks" rows="4" maxlength="200" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2">${text('图片上传')}：</label>
+							<div class="col-sm-10">
+								<#form:fileupload id="uploadImage" bizKey="${xhsWarehouseOutput.id}" bizType="xhsWarehouseOutput_image"
+									uploadType="image" class="" readonly="false"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2">${text('附件上传')}：</label>
+							<div class="col-sm-10">
+								<#form:fileupload id="uploadFile" bizKey="${xhsWarehouseOutput.id}" bizType="xhsWarehouseOutput_file"
+									uploadType="all" class="" readonly="false"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				 -->
+				<h4 class="form-unit">${text('收货地址')}</h4>
+				<div class="ml10 mr10" style="height:35px">
+				  <button type="button" class="btn btn-sm btn-default" id="btnSecReceiveAddr" onclick=""> ${text('选择收货地址')}</button>
+				</div>
+				<div class="ml10 mr10">
+					<table id="xhsWarehouseOutputReceiverDataGrid"></table>
+				</div>
+				<h4 class="form-unit">${text('发货地址')}</h4>
+				<div class="ml10 mr10" style="height:35px">
+				  <button type="button" class="btn btn-sm btn-default" id="btnSecSendAddr" onclick=""> ${text('选择发货地址')}</button>
+				</div>
+				<div class="ml10 mr10">
+					<table id="xhsWarehouseOutputSenderDataGrid"></table>
+				</div>
+				<h4 class="form-unit">${text('物流备注')}</h4>
+				<div class="ml10 mr10">
+					<table id="xhsWarehouseOutputLogisticsDataGrid"></table>
+				</div>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('xhs:warehouseoutput:xhsWarehouseOutput:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+//初始化收货地址DataGrid对象
+$("#xhsWarehouseOutputReceiverDataGrid").dataGrid({
+
+	data: ${toJson(xhsWarehouseOutput.xhsWarehouseOutputReceiverList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'id', editable:true, hidden:true},
+		{header:'${text('出库单号')}', name:'outputId.id', editable:true, hidden:true},
+		{header:'${text('收件人姓名')}', name:'receiverName', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control'}},
+		{header:'${text('收件人地址')}', name:'receiverAddr', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control'}},
+		{header:'${text('收件人电话')}', name:'receiverPhone', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'20', 'class':'form-control'}},
+		{header:'${text('操作')}', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsWarehouseOutputReceiverDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsWarehouseOutputReceiverDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'})});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	editGridInitRowNum: 1,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#xhsWarehouseOutputReceiverDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'xhsWarehouseOutputReceiverList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,id,outputId.id,receiverName,receiverAddr,receiverPhone,remarks,createBy,createDate,updateBy,updateDate,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化发货地址DataGrid对象
+$("#xhsWarehouseOutputSenderDataGrid").dataGrid({
+
+	data: ${toJson(xhsWarehouseOutput.xhsWarehouseOutputSenderList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'id', editable:true, hidden:true},
+		{header:'${text('出库单号')}', name:'outputId.id', editable:true, hidden:true},
+		{header:'${text('寄件人姓名')}', name:'senderName', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control'}},
+		{header:'${text('寄件人地址')}', name:'senderAddr', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control'}},
+		{header:'${text('寄件人电话')}', name:'senderPhone', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'20', 'class':'form-control'}},
+		{header:'${text('操作')}', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsWarehouseOutputSenderDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsWarehouseOutputSenderDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'})});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	editGridInitRowNum: 1,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#xhsWarehouseOutputSenderDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'xhsWarehouseOutputSenderList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,id,outputId.id,senderName,senderAddr,senderPhone,remarks,createBy,createDate,updateBy,updateDate,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化物流DataGrid对象
+$("#xhsWarehouseOutputLogisticsDataGrid").dataGrid({
+
+	data: ${toJson(xhsWarehouseOutput.xhsWarehouseOutputLogisticsList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'id', editable:true, hidden:true},
+		{header:'${text('出货单号')}', name:'outputId.id', editable:true, hidden:true},
+		{header:'${text('备注')}', name:'remarks', width:150, editable:true, edittype:'textarea', editoptions:{'maxlength':'200', 'class':'form-control', 'rows':'1'}},
+		{header:'${text('操作')}', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsWarehouseOutputLogisticsDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text('你确认要删除这条数据吗？')}\', function(){$(\'#xhsWarehouseOutputLogisticsDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'})});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	editGridInitRowNum: 1,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#xhsWarehouseOutputLogisticsDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'xhsWarehouseOutputLogisticsList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,id,outputId.id,mailType,mailNumber,remarks,createBy,createDate,updateBy,updateDate,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+function listselectCallback(id, action, index, layero) {
+	if (id == 'productSelect' && action == 'ok') {
+		if ($('#productSelectCode').val() != '') {
+			js.ajaxSubmit('${ctxPath}/a/xhs/product/xhsProductInfo/getProductById', {
+				id : $('#productSelectCode').val()
+			}, function(data) {
+				$('#price').val(data.xhsProductInfo.sellPrice);
+				$('#per').val(data.xhsProductInfo.per);
+			});
+		} else {
+			js.showMessage('请选择产品');
+		}
+	}
+}
+</script>

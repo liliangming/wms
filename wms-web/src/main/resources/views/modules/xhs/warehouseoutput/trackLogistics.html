@@ -1,0 +1,135 @@
+<% layout('/layouts/default.html', {title: '物流跟踪', libs: ['validate','fileupload','dataGrid']}){ %>
+<style>
+	body{font-size: 12px;}
+    ul li{list-style: none;}
+	.track-rcol{width: 100%; border: 1px solid #eee;}
+	.track-list{margin: 20px; padding-left: 5px; position: relative;}
+	.track-list li{position: relative; padding: 9px 0 0 25px; line-height: 18px; border-left: 1px solid #d9d9d9; color: #999;}
+	.track-list li.first{color: red; padding-top: 0; border-left-color: #fff;}
+	.track-list li .node-icon{position: absolute; left: -6px; top: 50%; width: 11px; height: 11px; background: url(http://demo.daimabiji.com/3531/img/order-icons.png)  -21px -72px no-repeat;}
+	.track-list li.first .node-icon{background-position:0 -72px;}
+	.track-list li .time{margin-right: 20px; position: relative; top: 4px; display: inline-block; vertical-align: middle;}
+	.track-list li .txt{max-width: 600px; position: relative; top: 4px; display: inline-block; vertical-align: middle;}
+	.track-list li.first .time{margin-right: 20px; }
+	.track-list li.first .txt{max-width: 600px; }
+</style>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('物流跟踪')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<div class="box-body">
+			<div class="form-unit">${text('物流信息')}</div>
+			    <div id="msg"></div>
+			    <div id="info" class="track-rcol" style="display:none"></div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<!--  
+						<% if (hasPermi('xhs:warehouseoutput:xhsWarehouseOutput:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('确定')}</button>&nbsp;
+						<% } %>
+						-->
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+		   </div>
+	    </div>
+    </div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+$(document).ready( function(){
+    // 为btn按钮绑定点击事件
+    var data = ${toJson(xhsWarehouseOutputLogisticsBO)};
+    if(!data.isRecordLogistics)
+    {
+    	$('#msg').html("请先输入快递单号");
+    	return;
+    }
+    
+    if(typeof(data.logisticsInfo) == "undefined")
+    {
+    	$('#msg').html("查询出错，请稍后重试！");
+    	return;
+    }
+    
+    if(typeof(data.logisticsInfo.code) == "undefined" || data.logisticsInfo.code != 200)
+    {
+    	if(typeof(data.logisticsInfo.msg) == "undefined" || data.logisticsInfo.msg  == null)
+    	{
+    		$('#msg').html("查询出错，请稍后重试！");
+    	}else
+    	{
+    		$('#msg').html(data.logisticsInfo.msg);
+    	}
+    	return;
+    }
+    
+    var result = data.logisticsInfo.result;
+    if(typeof(result) == "undefined")
+    {
+    	$('#msg').html("查询出错，请稍后重试！");
+    	return;
+    }
+    
+    if(typeof(result.status) == "undefined" || result.status != '200')
+    {
+    	if(typeof(result.message) == "undefined" || result.message == null || result.message == '')
+    	{
+    		$('#msg').html( "未查询到相关信息");
+    	}else
+    	{
+    		$('#msg').html(result.message);
+    	}
+    	
+    	return;
+    }
+    
+    var infoList = result.data;
+    if(typeof(infoList) == "undefined")
+    {
+    	$('#msg').html("查询出错，请稍后重试！");
+    	return;
+    }
+    
+    if(infoList.length > 0)
+    {
+    	var strhtml = "<div class='track-list'><ul>";
+        $.each(infoList,function(n,value) { 
+        	if( n == 0 )
+        	{
+        		strhtml += "<li class='first'>";
+        	}else
+        	{
+        		strhtml += "<li>";
+        	}
+        	strhtml += "<i class='node-icon'></i><span class='time'>"+value.time+"</span><span class='txt'>"+ value.context +"</span></li>";
+        });
+        strhtml += "<ul></div>";
+        $('#info').html(strhtml);
+        $('#info').show();
+    }else
+    {
+    	$('#msg').html("未查询到相关信息");
+    }
+} );
+</script>
