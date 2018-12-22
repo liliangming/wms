@@ -19,7 +19,16 @@
 							<label class="control-label col-sm-4" title="">
 								<span class="required ">*</span> ${text('客户名称')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
-								<#form:input path="name" maxlength="100" class="form-control required"/>
+								<#form:input path="name" maxlength="100" class="form-control required" placeholder="${text('请输入客户名称')}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('权重')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="sort" maxlength="11" class="form-control required digits" placeholder="${text('权重越大排名越靠前，请填写数字。')}"/>
 							</div>
 						</div>
 					</div>
@@ -30,7 +39,7 @@
 							<label class="control-label col-sm-4" title="">
 								<span class="required ">*</span> ${text('客户地址')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
-								<#form:textarea path="addr" rows="4" maxlength="200" class="form-control required"/>
+								<#form:textarea path="addr" rows="4" maxlength="200" class="form-control required" placeholder="${text('请输入客户地址')}"/>
 							</div>
 						</div>
 					</div>
@@ -39,7 +48,10 @@
 							<label class="control-label col-sm-4" title="">
 								<span class="required hide">*</span> ${text('办公电话')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
-								<#form:input path="phoneNumber" maxlength="20" class="form-control phone"/>
+							  <div class="input-group">
+								<#form:input path="phoneNumber" maxlength="20" class="form-control phone" placeholder="${text('请输入办公电话')}"/>
+								<span class="input-group-addon"><i class="fa fa-fw fa-phone"></i></span>
+							  </div>
 							</div>
 						</div>
 					</div>
@@ -50,7 +62,10 @@
 							<label class="control-label col-sm-4" title="">
 								<span class="required hide">*</span> ${text('移动电话')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
-								<#form:input path="mobileNumber" maxlength="20" class="form-control phone"/>
+							  <div class="input-group">
+								<#form:input path="mobileNumber" maxlength="20" class="form-control mobile" placeholder="${text('请输入移动电话')}"/>
+								<span class="input-group-addon"><i class="fa fa-fw fa-mobile"></i></span>
+							  </div>
 							</div>
 						</div>
 					</div>
@@ -59,7 +74,10 @@
 							<label class="control-label col-sm-4" title="">
 								<span class="required hide">*</span> ${text('电子邮件')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
-								<#form:input path="email" maxlength="50" class="form-control email"/>
+							  <div class="input-group">
+								<#form:input path="email" maxlength="50" class="form-control email" placeholder="${text('请输入电子邮件')}"/>
+								<span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
+							  </div>
 							</div>
 						</div>
 					</div>
@@ -70,7 +88,10 @@
 							<label class="control-label col-sm-4" title="">
 								<span class="required hide">*</span> ${text('企业QQ')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
-								<#form:input path="qqNumber" maxlength="20" class="form-control qq"/>
+							  <div class="input-group">
+								<#form:input path="qqNumber" maxlength="20" class="form-control qq" placeholder="${text('请输入企业QQ')}"/>
+								<span class="input-group-addon"><i class="fa fa-fw fa-qq"></i></span>
+							  </div>
 							</div>
 						</div>
 					</div>
@@ -79,7 +100,10 @@
 							<label class="control-label col-sm-4" title="">
 								<span class="required hide">*</span> ${text('企业微信')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
-								<#form:input path="webchatNumber" maxlength="50" class="form-control"/>
+							  <div class="input-group">
+								<#form:input path="webchatNumber" maxlength="50" class="form-control" placeholder="${text('请输入企业微信')}"/>
+								<span class="input-group-addon"><i class="fa fa-fw fa-weixin"></i></span>
+							  </div>
 							</div>
 						</div>
 					</div>
@@ -90,18 +114,7 @@
 							<label class="control-label col-sm-2" title="">
 								<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-10">
-								<#form:textarea path="remarks" rows="4" maxlength="500" class="form-control"/>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required hide">*</span> ${text('权重')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<#form:input path="sort" maxlength="11" class="form-control digits"/>
+								<#form:textarea path="remarks" rows="4" maxlength="500" class="form-control" placeholder="${text('无')}"/>
 							</div>
 						</div>
 					</div>
@@ -148,9 +161,9 @@ $("#xhsCustomerContactDataGrid").dataGrid({
 		{header:'状态', name:'status', editable:true, hidden:true},
 		{header:'主键', name:'id', editable:true, hidden:true},
 		{header:'${text('客户id')}', name:'customerId.id', editable:true, hidden:true},
-		{header:'${text('姓名')}', name:'name', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control required'}},
+		{header:'${text('姓名')}', name:'name', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control'}},
 		{header:'${text('性别')}', name:'sex', width:100, 
-			editable:true, edittype:'select', editoptions:{'class':'form-control required digits',
+			editable:true, edittype:'select', editoptions:{'class':'form-control digits',
 				items: $.merge([{dictLabel:'&nbsp;',dictValue:''}], ${@DictUtils.getDictListJson('sys_user_sex')}),
 				itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
 					$(element).select2().on("change",function(){$(this).valid()});
@@ -203,9 +216,9 @@ $("#xhsCustomerMailDataGrid").dataGrid({
 		{header:'状态', name:'status', editable:true, hidden:true},
 		{header:'主键', name:'id', editable:true, hidden:true},
 		{header:'${text('客户id')}', name:'customerId.id', editable:true, hidden:true},
-		{header:'${text('收件人姓名')}', name:'mailName', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control required'}},
-		{header:'${text('收件人地址')}', name:'mailAddr', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control required'}},
-		{header:'${text('收件人电话')}', name:'mailPhone', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'20', 'class':'form-control required'}},
+		{header:'${text('收件人姓名')}', name:'mailName', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control'}},
+		{header:'${text('收件人地址')}', name:'mailAddr', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control'}},
+		{header:'${text('收件人电话')}', name:'mailPhone', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'20', 'class':'form-control'}},
 		{header:'${text('默认地址')}', name:'isDefault', width:100, 
 			editable:true, edittype:'select', editoptions:{'class':'form-control digits',
 				items: $.merge([{dictLabel:'&nbsp;',dictValue:''}], ${@DictUtils.getDictListJson('sys_yes_no')}),
