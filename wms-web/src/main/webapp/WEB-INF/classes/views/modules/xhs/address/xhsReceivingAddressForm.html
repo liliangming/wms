@@ -19,16 +19,21 @@
 							<label class="control-label col-sm-4" title="">
 								<span class="required ">*</span> ${text('收件人')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
-								<#form:input path="receiverName" maxlength="100" class="form-control required"/>
+								<#form:input path="receiverName" maxlength="100" class="form-control required" placeholder="${text('请输入收件人姓名')}"/>
 							</div>
 						</div>
 					</div>
+				</div>
+				<div class="row">
 					<div class="col-xs-6">
 						<div class="form-group">
 							<label class="control-label col-sm-4" title="">
 								<span class="required ">*</span> ${text('电话号码')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
-								<#form:input path="receiverPhone" maxlength="20" class="form-control required phone"/>
+							  <div class="input-group">
+								<#form:input path="receiverPhone" maxlength="20" class="form-control required phone" placeholder="${text('请输入电话号码')}"/>
+								<span class="input-group-addon"><i class="fa fa-fw fa-phone"></i></span>
+							  </div>
 							</div>
 						</div>
 					</div>
@@ -39,7 +44,7 @@
 							<label class="control-label col-sm-4" title="">
 								<span class="required ">*</span> ${text('地址')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
-								<#form:input path="receiverAddr" maxlength="200" class="form-control required"/>
+								<#form:input path="receiverAddr" maxlength="200" class="form-control required" placeholder="${text('请输入收货地址')}"/>
 							</div>
 						</div>
 					</div>
