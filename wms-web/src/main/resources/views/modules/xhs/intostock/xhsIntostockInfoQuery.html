@@ -1,0 +1,130 @@
+<% layout('/layouts/default.html', {title: '入库登记', libs: ['validate','dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('查看入库登记')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${xhsIntostockInfo}" action="" method="" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="id"/>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('入库类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input id="instockType" path="instockType" readonly="true" class="form-control required" placeholder="${text('无')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('仓储')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="warehouse" title="${text('仓储')}" readonly="true"
+									path="warehouse.treeCode" labelPath="warehouse.treeName"
+									url="${ctx}/xhs/warehouse/xhsWarehouseTree/treeData"
+									class="" allowClear="true" canSelectRoot="true" canSelectParent="true" placeholder="${text('无')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('供应商')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:listselect id="supplierSelect" title="供应商" labelPath="supplier.name" readonly="true"
+                                    path="supplier.id" url="${ctx}/xhs/supplier/xhsSupplierInfo/supplierSelect" allowClear="false" 
+                                    checkbox="false" itemCode="id" itemName="name" placeholder="${text('无')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('入库备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-10">
+								<#form:textarea path="remarks" rows="4" maxlength="200" class="form-control" readonly="true" placeholder="${text('无')}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<h4 class="form-unit">${text('入库产品列表')}</h4>
+				<div class="ml10 mr10">
+					<table id="xhsIntostockProductDataGrid"></table>
+				</div>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-1 col-sm-10">
+						<button type="button" class="btn btn-sm btn-primary" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$(document).ready( function(){
+	$("#instockType").val(js.getDictLabel(${@DictUtils.getDictListJson('sys_intostock_type')}, $("#instockType").val(), '${text('未知')}', true));
+});
+
+//初始化入库产品列表DataGrid对象
+$("#xhsIntostockProductDataGrid").dataGrid({
+
+	data: ${toJson(xhsIntostockInfo.xhsIntostockProductList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:false, hidden:true},
+		{header:'主键', name:'id', editable:false, hidden:true},
+		{header:'${text('入库单')}', name:'intostockId.id', editable:false, hidden:true},
+		{header:'${text('产品')}', name:'productName', editable:false},
+		{header:'${text('数量')}', name:'quantity', width:150, editable:false, edittype:'text', editoptions:{'maxlength':'11', 'class':'form-control required digits'}},
+		//{header:'${text('描述')}', name:'remarks', width:150, editable:${xhsIntostockInfo.isNewRecord}, edittype:'textarea', editoptions:{'maxlength':'200', 'class':'form-control', 'rows':'1'}},
+		],
+		
+	// 编辑表格参数
+	editGrid: false,				// 是否是编辑表格
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
+<script id="listselectTpl" type="text/template">//<!--<div>
+<#form:listselect id="{{d.id}}" title="{{d.title}}" url="{{d.url}}"
+  allowClear="false" checkbox="false" path="{{d.path}}" labelPath="{{d.labelPath}}"
+  itemCode="{{d.itemCode}}" itemName="{{d.itemName}}"  placeholder="${text('请选择出产品')}"/>
+</div>//--></script>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+</script>

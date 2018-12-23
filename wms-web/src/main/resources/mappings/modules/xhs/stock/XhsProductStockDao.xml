@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.xhs.dao.stock.XhsProductStockDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="XhsProductStock">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	
+	<insert id="addXhsProductStock" parameterType="com.jeesite.modules.xhs.entity.stock.XhsProductStock">
+	    insert into xhs_stock_info(id,
+	                               product_id,
+	                               warehouse_code,
+	                               quantity,
+	                               status,
+	                               create_by,
+	                               create_date,
+	                               update_by,
+	                               update_date
+	                              ) 
+	                        values(#{id},
+	                               #{product.id},
+	                               #{warehouse.treeCode},
+	                               #{quantity},
+	                               0,
+	                               #{createBy},
+	                               CURRENT_TIMESTAMP(),
+	                               #{updateBy},
+	                               CURRENT_TIMESTAMP()
+	                              )
+	    on duplicate key update quantity = quantity + ifnull(quantity,0),
+	                            update_by = #{updateBy},
+	                            update_date = CURRENT_TIMESTAMP()
+	</insert>
+	
+</mapper>

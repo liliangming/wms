@@ -265,6 +265,88 @@ create table xhs_receiving_address
 
 alter table xhs_receiving_address comment '收货地址信息';
 
+drop table if exists xhs_stock_info;
+/*==============================================================*/
+/* Table: xhs_stock_info                                     */
+/*==============================================================*/
+create table xhs_stock_info
+(
+   id                   varchar(50) not null comment '入库单号',
+   product_id           varchar(50) comment '产品id',
+   warehouse_code       varchar(50) comment '入库仓库或分区编码',
+   quantity             int default 0 comment '入库数量',
+   remarks              varchar(200) comment '描述',
+   status               int default 0 comment '状态',
+   create_by            varchar(50) comment '创建者',
+   create_date          timestamp default CURRENT_TIMESTAMP() comment '创建时间',
+   update_by            varchar(50) comment '更新者',
+   update_date          timestamp default CURRENT_TIMESTAMP() comment '更新时间',
+   primary key (id),
+   unique(product_id,warehouse_code)
+);
+
+alter table xhs_stock_info comment '产品库存信息';
+
+drop table if exists xhs_intostock_info;
+
+/*==============================================================*/
+/* Table: xhs_intostock_info                                     */
+/*==============================================================*/
+create table xhs_intostock_info
+(
+   id                   varchar(50) not null comment '入库单号',
+   supplier_id          varchar(50) comment '供应商id',
+   warehouse_code       varchar(50) comment '入库仓库或分区编码',
+   product_num          int default 0 comment '入库产品种数',
+   quantity             int default 0 comment '入库产品总数',
+   remarks              varchar(200) comment '描述',
+   instock_type         varchar(20) comment '入库类型',
+   instock_status       varchar(20) comment '入库状态',
+   status               int default 0 comment '状态',
+   create_by            varchar(50) comment '创建者',
+   create_date          timestamp default CURRENT_TIMESTAMP() comment '创建时间',
+   update_by            varchar(50) comment '更新者',
+   update_date          timestamp default CURRENT_TIMESTAMP() comment '更新时间',
+   primary key (id)
+);
+
+alter table xhs_intostock_info comment '入库登记信息';
+
+drop table if exists xhs_intostock_product;
+
+/*==============================================================*/
+/* Table: xhs_intostock_product                                     */
+/*==============================================================*/
+create table xhs_intostock_product
+(
+   id                   varchar(50) not null comment '入库单号',
+   intostock_id         varchar(50) comment '入库单id',
+   product_id           varchar(50) comment '产品id',
+   quantity             int default 0 comment '入库数量',
+   remarks              varchar(200) comment '描述',
+   status               int default 0 comment '状态',
+   create_by            varchar(50) comment '创建者',
+   create_date          timestamp default CURRENT_TIMESTAMP() comment '创建时间',
+   update_by            varchar(50) comment '更新者',
+   update_date          timestamp default CURRENT_TIMESTAMP() comment '更新时间',
+   primary key (id)
+);
+
+alter table xhs_intostock_product comment '入库产品列表信息';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 drop table if exists xhs_warehouse_input;
 
 /*==============================================================*/
@@ -389,106 +471,4 @@ create table xhs_warehouse_output_logistics
 alter table xhs_warehouse_output_logistics comment '出库物流信息';
 
 
-
-
-
-
-
-
-drop table if exists xhs_shipment_info;
-
-/*==============================================================*/
-/* Table: xhs_shipment_info                                     */
-/*==============================================================*/
-create table xhs_shipment_info
-(
-   id                   varchar(50) not null comment '单号',
-   product_id           varchar(50) comment '产品id',
-   quantity             int comment '出货数量',
-   price                decimal(10,2) comment '出货单价',
-   per                  int comment '单位数量',
-   currency             varchar(10) comment '币种',
-   warehouse_id         varchar(50) comment '出货仓库id',
-   warehouse_pos_id     varchar(50) comment '出库仓库分区id',
-   customer_id          varchar(50) comment '客户id',
-   remarks              varchar(200) comment '产品描述',
-   shipment_status      varchar(50) comment '出货状态',
-   status               int comment '状态',
-   create_by            varchar(50) comment '创建者',
-   create_date          timestamp default CURRENT_TIMESTAMP() comment '创建时间',
-   update_by            varchar(50) comment '更新者',
-   update_date          timestamp default CURRENT_TIMESTAMP() comment '更新时间',
-   primary key (id)
-);
-
-alter table xhs_shipment_info comment '出货信息';
-
-
-drop table if exists xhs_shipment_receiver;
-
-/*==============================================================*/
-/* Table: xhs_shipment_receiver                                */
-/*==============================================================*/
-create table xhs_shipment_receiver
-(
-   id                   varchar(50) not null comment '主键',
-   shipment_id          varchar(50) comment '出货单号',
-   receiver_name        varchar(100) comment '收件人姓名',
-   receiver_addr        varchar(200) comment '收件人地址',
-   receiver_phone       varchar(20) comment '收件人电话',
-   remarks              varchar(200) comment '备注',
-   status               int comment '状态',
-   create_by            varchar(50) comment '创建者',
-   create_date          timestamp default CURRENT_TIMESTAMP() comment '创建时间',
-   update_by            varchar(50) comment '更新者',
-   update_date          timestamp default CURRENT_TIMESTAMP() comment '更新时间',
-   primary key (id)
-);
-
-alter table xhs_shipment_receiver comment '出货单收货人信息';
-
-drop table if exists xhs_shipment_sender;
-
-/*==============================================================*/
-/* Table: xhs_shipment_sender                                */
-/*==============================================================*/
-create table xhs_shipment_sender
-(
-   id                   varchar(50) not null comment '主键',
-   shipment_id          varchar(50) comment '出货单号',
-   sender_name          varchar(100) comment '寄件人姓名',
-   sender_addr          varchar(200) comment '寄件人地址',
-   sender_phone         varchar(20) comment '寄件人电话',
-   remarks              varchar(200) comment '备注',
-   status               int comment '状态',
-   create_by            varchar(50) comment '创建者',
-   create_date          timestamp default CURRENT_TIMESTAMP() comment '创建时间',
-   update_by            varchar(50) comment '更新者',
-   update_date          timestamp default CURRENT_TIMESTAMP() comment '更新时间',
-   primary key (id)
-);
-
-alter table xhs_shipment_sender comment '出货单发货人信息';
-
-drop table if exists xhs_shipment_logistics;
-
-/*==============================================================*/
-/* Table: xhs_shipment_logistics                                */
-/*==============================================================*/
-create table xhs_shipment_logistics
-(
-   id                   varchar(50) not null comment '主键',
-   shipment_id          varchar(50) comment '出货单号',
-   mail_type            varchar(20) comment '快递类型',
-   mail_number          varchar(50) comment '快递单号',
-   remarks              varchar(200) comment '备注',
-   status               int comment '状态',
-   create_by            varchar(50) comment '创建者',
-   create_date          timestamp default CURRENT_TIMESTAMP() comment '创建时间',
-   update_by            varchar(50) comment '更新者',
-   update_date          timestamp default CURRENT_TIMESTAMP() comment '更新时间',
-   primary key (id)
-);
-
-alter table xhs_shipment_logistics comment '出货单物流信息';
 

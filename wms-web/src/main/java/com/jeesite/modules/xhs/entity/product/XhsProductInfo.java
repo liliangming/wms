@@ -36,9 +36,6 @@ public class XhsProductInfo extends DataEntity<XhsProductInfo> {
 	private Long per; // per
 	private String currency; // 币种
 
-	private String sellPriceDesc;
-	private String purchasePriceDesc;
-
 	public XhsProductInfo() {
 		this(null);
 	}
@@ -73,10 +70,6 @@ public class XhsProductInfo extends DataEntity<XhsProductInfo> {
 
 	public void setSellPrice(Double sellPrice) {
 		this.sellPrice = sellPrice;
-
-		if (this.sellPrice != null) {
-			setSellPriceDesc(String.format("%s元/%s个", this.sellPrice, (per == null ? 1 : per)));
-		}
 	}
 
 	public Double getPurchasePrice() {
@@ -85,10 +78,6 @@ public class XhsProductInfo extends DataEntity<XhsProductInfo> {
 
 	public void setPurchasePrice(Double purchasePrice) {
 		this.purchasePrice = purchasePrice;
-
-		if (this.purchasePrice != null) {
-			setPurchasePriceDesc(String.format("%s元/%s个", this.purchasePrice, (per == null ? 1 : per)));
-		}
 	}
 
 	public Long getPer() {
@@ -106,21 +95,5 @@ public class XhsProductInfo extends DataEntity<XhsProductInfo> {
 
 	public void setCurrency(String currency) {
 		this.currency = currency;
-	}
-
-	public String getSellPriceDesc() {
-		return sellPriceDesc;
-	}
-
-	public void setSellPriceDesc(String sellPriceDesc) {
-		this.sellPriceDesc = sellPriceDesc;
-	}
-
-	public String getPurchasePriceDesc() {
-		return purchasePriceDesc;
-	}
-
-	public void setPurchasePriceDesc(String purchasePriceDesc) {
-		this.purchasePriceDesc = purchasePriceDesc;
 	}
 }
