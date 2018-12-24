@@ -19,18 +19,19 @@
 					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
 				<div class="form-group">
 					<label class="control-label">${text('产品')}：</label>
-					<div class="control-inline width-120" >
-						<#form:treeselect id="productId" title="${text('机构选择')}"
-							path="productId" labelPath="" 
-							url="${ctx}/sys/office/treeData" allowClear="true"/>
+					<div class="control-inline width-140" >
+						<#form:listselect id="productSelect" title="产品"
+                            path="product.id" url="${ctx}/xhs/product/xhsProductInfo/productSelect" allowClear="false" 
+                            checkbox="false" itemCode="id" itemName="productName"/>
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="control-label">${text('仓库')}：</label>
-					<div class="control-inline width-120" >
-						<#form:treeselect id="warehouseCode" title="${text('用户选择')}"
-							path="warehouseCode" labelPath="" 
-							url="${ctx}/sys/office/treeData?isLoadUser=true" allowClear="true"/>
+					<label class="control-label">${text('仓储')}：</label>
+					<div class="control-inline width-140" >
+						<#form:treeselect id="warehouse" title="${text('仓储')}"
+							path="warehouse.treeCode" labelPath="warehouse.treeName"
+							url="${ctx}/xhs/warehouse/xhsWarehouseTree/treeData"
+							class="" allowClear="true" canSelectRoot="true" canSelectParent="true"/>
 					</div>
 				</div>
 				<div class="form-group">
