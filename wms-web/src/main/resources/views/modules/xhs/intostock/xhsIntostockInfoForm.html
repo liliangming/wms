@@ -19,6 +19,7 @@
 							<label class="control-label col-sm-4" title="">
 								<span class="required ">*</span> ${text('入库类型')}：<i class="fa icon-question hide"></i></label>
 							<div class="col-sm-8">
+								<#form:input path="instockStatus" value="0" hidden="true"/>
 								<#form:select path="instockType" dictType="sys_intostock_type" class="form-control required" placeholder="${text('请选择入库类型')}"/>
 							</div>
 						</div>

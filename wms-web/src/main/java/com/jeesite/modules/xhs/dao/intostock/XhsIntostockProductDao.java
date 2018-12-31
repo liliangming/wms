@@ -9,10 +9,11 @@ import com.jeesite.modules.xhs.entity.intostock.XhsIntostockProduct;
 
 /**
  * 入库登记信息DAO接口
+ * 
  * @author liliangming
  * @version 2018-12-23
  */
 @MyBatisDao
 public interface XhsIntostockProductDao extends CrudDao<XhsIntostockProduct> {
-	
+
 }

@@ -70,5 +70,4 @@ public class XhsProductStockService extends CrudService<XhsProductStockDao, XhsP
 	public void delete(XhsProductStock xhsProductStock) {
 		super.delete(xhsProductStock);
 	}
-	
 }

@@ -12,4 +12,12 @@
 		ORDER BY ${sqlMap.order.toSql()}
 	</select> -->
 	
+	<update id="updateIntostockStatus">
+	    update xhs_intostock_info 
+	       set instock_status = #{intostockStatus},
+	           update_by = #{updateBy},
+	           update_date = CURRENT_TIMESTAMP()
+	    where id = #{id}
+	</update>
+	
 </mapper>

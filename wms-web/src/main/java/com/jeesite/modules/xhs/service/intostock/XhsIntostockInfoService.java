@@ -13,12 +13,13 @@ import com.jeesite.common.entity.Page;
 import com.jeesite.common.service.CrudService;
 import com.jeesite.modules.xhs.dao.intostock.XhsIntostockInfoDao;
 import com.jeesite.modules.xhs.dao.intostock.XhsIntostockProductDao;
-import com.jeesite.modules.xhs.dao.stock.XhsProductStockDao;
+import com.jeesite.modules.xhs.dao.stock.XhsProductStockDetailDao;
 import com.jeesite.modules.xhs.entity.intostock.XhsIntostockInfo;
 import com.jeesite.modules.xhs.entity.intostock.XhsIntostockProduct;
 import com.jeesite.modules.xhs.entity.product.XhsProductInfo;
-import com.jeesite.modules.xhs.entity.stock.XhsProductStock;
+import com.jeesite.modules.xhs.entity.stock.XhsProductStockDetail;
 import com.jeesite.modules.xhs.entity.warehouse.XhsWarehouseTree;
+import com.jeesite.modules.xhs.exception.MyException;
 
 /**
  * 入库登记信息Service
@@ -31,10 +32,13 @@ import com.jeesite.modules.xhs.entity.warehouse.XhsWarehouseTree;
 public class XhsIntostockInfoService extends CrudService<XhsIntostockInfoDao, XhsIntostockInfo> {
 
 	@Autowired
+	private XhsIntostockInfoDao xhsIntostockInfoDao;
+
+	@Autowired
 	private XhsIntostockProductDao xhsIntostockProductDao;
 
 	@Autowired
-	private XhsProductStockDao xhsProductStockDao;
+	private XhsProductStockDetailDao xhsProductStockDetailDao;
 
 	/**
 	 * 获取单条数据
@@ -64,12 +68,6 @@ public class XhsIntostockInfoService extends CrudService<XhsIntostockInfoDao, Xh
 	 */
 	@Override
 	public Page<XhsIntostockInfo> findPage(XhsIntostockInfo xhsIntostockInfo) {
-		// String quantity = "(SELECT sum(ifnull(quantity,0)) FROM
-		// xhs_intostock_product WHERE intostock_id=a.id) AS \"quantity\", "
-		// + "(SELECT count(distinct product_id) FROM xhs_intostock_product
-		// WHERE intostock_id=a.id) AS \"productNum\"";
-		// xhsIntostockInfo.getSqlMap().add("quantity", quantity);
-
 		return super.findPage(xhsIntostockInfo);
 	}
 
@@ -84,6 +82,7 @@ public class XhsIntostockInfoService extends CrudService<XhsIntostockInfoDao, Xh
 		List<XhsIntostockProduct> list = xhsIntostockInfo.getXhsIntostockProductList();
 		xhsIntostockInfo.setProductNum(0L);
 		xhsIntostockInfo.setQuantity(0L);
+		xhsIntostockInfo.setInstockStatus("0");
 		// 计算产品种数和总数
 		if (list != null && !list.isEmpty()) {
 			for (XhsIntostockProduct xhsIntostockProduct : list) {
@@ -106,25 +105,22 @@ public class XhsIntostockInfoService extends CrudService<XhsIntostockInfoDao, Xh
 					xhsIntostockProductDao.update(xhsIntostockProduct);
 				}
 
-				XhsProductStock xhsProductStock = new XhsProductStock();
-				xhsProductStock.setProduct(new XhsProductInfo(xhsIntostockProduct.getProductId()));
-				xhsProductStock.setWarehouse(new XhsWarehouseTree(xhsIntostockInfo.getWarehouse().getTreeCode()));
-				xhsProductStock.setQuantity(xhsIntostockProduct.getQuantity());
-				// xhsProductStock.setCreateBy(xhsIntostockInfo.getCreateBy());
-				// xhsProductStock.setUpdateBy(xhsIntostockInfo.getUpdateBy());
-				xhsProductStock.preInsert();
-				xhsProductStockDao.addXhsProductStock(xhsProductStock);
+				XhsProductStockDetail xhsProductStockDetail = new XhsProductStockDetail();
+				xhsProductStockDetail.setProduct(new XhsProductInfo(xhsIntostockProduct.getProductId()));
+				xhsProductStockDetail.setWarehouse(new XhsWarehouseTree(xhsIntostockInfo.getWarehouse().getTreeCode()));
+				xhsProductStockDetail.setQuantity(xhsIntostockProduct.getQuantity());
+				xhsProductStockDetail.preInsert();
+				xhsProductStockDetailDao.addXhsProductStockDetail(xhsProductStockDetail);
 			} else {
 				xhsIntostockProductDao.delete(xhsIntostockProduct);
 
-				XhsProductStock xhsProductStock = new XhsProductStock();
-				xhsProductStock.setProduct(new XhsProductInfo(xhsIntostockProduct.getProductId()));
-				xhsProductStock.setWarehouse(new XhsWarehouseTree(xhsIntostockInfo.getWarehouse().getTreeCode()));
-				xhsProductStock.setQuantity(
+				XhsProductStockDetail xhsProductStockDetail = new XhsProductStockDetail();
+				xhsProductStockDetail.setProduct(new XhsProductInfo(xhsIntostockProduct.getProductId()));
+				xhsProductStockDetail.setWarehouse(new XhsWarehouseTree(xhsIntostockInfo.getWarehouse().getTreeCode()));
+				xhsProductStockDetail.setQuantity(
 						(xhsIntostockProduct.getQuantity() == null ? 0 : xhsIntostockProduct.getQuantity()) * -1);
-				// xhsProductStock.setUpdateBy(xhsIntostockInfo.getUpdateBy());
-				xhsProductStock.preInsert();
-				xhsProductStockDao.addXhsProductStock(xhsProductStock);
+				xhsProductStockDetail.preInsert();
+				xhsProductStockDetailDao.addXhsProductStockDetail(xhsProductStockDetail);
 			}
 		}
 	}
@@ -152,6 +148,39 @@ public class XhsIntostockInfoService extends CrudService<XhsIntostockInfoDao, Xh
 		XhsIntostockProduct xhsIntostockProduct = new XhsIntostockProduct();
 		xhsIntostockProduct.setIntostockId(xhsIntostockInfo);
 		xhsIntostockProductDao.delete(xhsIntostockProduct);
+	}
+
+	@Transactional(readOnly = false, rollbackFor = Exception.class)
+	public void cancel(XhsIntostockInfo xhsIntostockInfo) throws Exception {
+		String instockStatus = xhsIntostockInfo.getInstockStatus();
+		xhsIntostockInfo = get(new XhsIntostockInfo(xhsIntostockInfo.getId()));
+		if (xhsIntostockInfo == null) {
+			throw new MyException("入库单不存在");
+		}
+
+		List<XhsIntostockProduct> list = xhsIntostockInfo.getXhsIntostockProductList();
+		if (list != null && !list.isEmpty()) {
+			Long quantity = 0L;
+			XhsProductStockDetail ex = null;
+			for (XhsIntostockProduct xhsIntostockProduct : list) {
+				quantity = xhsProductStockDetailDao.getQuantityByProductIdAndWarehouseCode(
+						xhsIntostockProduct.getProductId(), xhsIntostockInfo.getWarehouse().getTreeCode());
+				if (quantity.compareTo(xhsIntostockProduct.getQuantity()) < 0) {
+					throw new MyException("库存不足");
+				}
+
+				// 撤销的入库登记需要将库存扣除
+				ex = new XhsProductStockDetail();
+				ex.setProduct(new XhsProductInfo(xhsIntostockProduct.getProductId()));
+				ex.setWarehouse(new XhsWarehouseTree(xhsIntostockInfo.getWarehouse().getTreeCode()));
+				ex.setQuantity(xhsIntostockProduct.getQuantity() * -1);
+				ex.preInsert();
+				xhsProductStockDetailDao.addXhsProductStockDetail(ex);
+			}
+		}
+
+		xhsIntostockInfoDao.updateIntostockStatus(xhsIntostockInfo.getId(), instockStatus,
+				xhsIntostockInfo.getUpdateBy());
 	}
 
 }

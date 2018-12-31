@@ -39,7 +39,7 @@ import com.jeesite.modules.xhs.entity.warehouse.XhsWarehouseTree;
 			@JoinTable(type = Type.LEFT_JOIN, entity = XhsSupplierInfo.class, attrName = "supplier", alias = "supplier", 
 			on = "supplier.id = a.supplier_id", 
 			columns = {@Column(includeEntity = XhsSupplierInfo.class) }), 
-	},orderBy="a.update_date DESC"
+	},orderBy="a.instock_status, a.update_date DESC"
 )
 public class XhsIntostockInfo extends DataEntity<XhsIntostockInfo> {
 	

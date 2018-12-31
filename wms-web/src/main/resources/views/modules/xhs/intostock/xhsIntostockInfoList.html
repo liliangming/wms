@@ -22,6 +22,12 @@
 					</div>
 				</div>
 				<div class="form-group">
+					<label class="control-label">${text('入库类型')}：</label>
+					<div class="control-inline width-120">
+						<#form:select path="instockType" dictType="sys_intostock_type" blankOption="true" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
 					<label class="control-label">${text('供应商')}：</label>
 					<div class="control-inline width-140">
 						<#form:listselect id="supplierSelect" title="供应商"
@@ -39,9 +45,9 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="control-label">${text('入库类型')}：</label>
+					<label class="control-label">${text('入库状态')}：</label>
 					<div class="control-inline width-120">
-						<#form:select path="instockType" dictType="sys_intostock_type" blankOption="true" class="form-control" />
+						<#form:select path="instockStatus" dictType="sys_intostock_status" blankOption="true" class="form-control" />
 					</div>
 				</div>
 				<div class="form-group">
@@ -69,13 +75,18 @@ $('#dataGrid').dataGrid({
 		{header:'${text('产品种类')}', name:'productNum', index:'supplier.name', width:150, align:"right"},
 		{header:'${text('产品数量')}', name:'quantity', index:'supplier.name', width:150, align:"right"},
 		{header:'${text('仓储')}', name:'warehouse.treeNames', index:'a.warehouse_code', width:150, align:"left"},
-		{header:'${text('描述')}', name:'remarks', index:'a.remarks', width:150, align:"left"},
+		{header:'${text('入库状态')}', name:'instockStatus', index:'a.instock_type', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('sys_intostock_status')}, val, '${text('未知')}', true);
+		}},
 		{header:'${text('入库时间')}', name:'createDate', index:'a.create_date', width:150, align:"center"},
 		{header:'${text('操作')}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
 			var actions = [];
 			<% if(hasPermi('xhs:intostock:xhsIntostockInfo:edit')){ %>
 				actions.push('<a href="${ctx}/xhs/intostock/xhsIntostockInfo/form?id='+row.id+'" class="btnList" title="${text('查看登记信息')}"><i class="fa fa-search"></i></a>&nbsp;&nbsp;');
-				actions.push('<a href="${ctx}/xhs/intostock/xhsIntostockInfo/delete?id='+row.id+'" class="btnList" title="${text('撤销入库登记')}" data-confirm="${text('确认要撤销该入库登记吗？')}"><i class="fa fa-reply"></i></a>&nbsp;');
+				if(row.instockStatus != '1')
+				{
+					actions.push('<a href="${ctx}/xhs/intostock/xhsIntostockInfo/cancel?id='+row.id+'&instockStatus=1" class="btnList" title="${text('撤销入库登记')}" data-confirm="${text('确认要撤销该入库登记吗？')}"><i class="fa fa-reply"></i></a>&nbsp;');
+				}
 			<% } %>
 			return actions.join('');
 		}}

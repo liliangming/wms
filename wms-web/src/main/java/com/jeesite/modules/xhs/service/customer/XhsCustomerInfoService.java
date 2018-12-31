@@ -3,20 +3,18 @@
  */
 package com.jeesite.modules.xhs.service.customer;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jeesite.common.entity.Page;
 import com.jeesite.common.service.CrudService;
-import com.jeesite.modules.xhs.entity.customer.XhsCustomerInfo;
-import com.jeesite.modules.xhs.dao.customer.XhsCustomerInfoDao;
-import com.jeesite.modules.xhs.entity.customer.XhsCustomerContact;
 import com.jeesite.modules.xhs.dao.customer.XhsCustomerContactDao;
-import com.jeesite.modules.xhs.entity.customer.XhsCustomerMail;
+import com.jeesite.modules.xhs.dao.customer.XhsCustomerInfoDao;
 import com.jeesite.modules.xhs.dao.customer.XhsCustomerMailDao;
+import com.jeesite.modules.xhs.entity.customer.XhsCustomerContact;
+import com.jeesite.modules.xhs.entity.customer.XhsCustomerInfo;
+import com.jeesite.modules.xhs.entity.customer.XhsCustomerMail;
 
 /**
  * 客户信息Service
